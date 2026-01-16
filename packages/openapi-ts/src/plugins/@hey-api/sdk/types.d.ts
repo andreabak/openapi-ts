@@ -2,7 +2,7 @@ import type { IndexExportOption } from '~/config/shared';
 import type { OperationsStrategy } from '~/openApi/shared/locations';
 import type { DefinePlugin, Plugin } from '~/plugins';
 import type { PluginClientNames, PluginValidatorNames } from '~/plugins/types';
-import type { NameTransformer } from '~/utils/naming';
+import type { Casing, NameTransformer } from '~/utils/naming';
 
 import type { ExamplesConfig, UserExamplesConfig } from './examples';
 import type { OperationsConfig, UserOperationsConfig } from './operations';
@@ -17,6 +17,18 @@ export type UserConfig = Plugin.Name<'@hey-api/sdk'> &
      * @default true
      */
     auth?: boolean;
+    /**
+     * Allow spreading body as parameters if it's the only object in the operation signature.
+     *
+     * @default true
+     */
+    bodyAllowSpread?: boolean;
+    /**
+     * Use the body schema type name for its parameter name in `'flat'` paramStructure.
+     *
+     * @default true
+     */
+    bodyParamAsTypeName?: boolean;
     /**
      * Use an internal client instance to send HTTP requests? This is useful if
      * you don't want to manually pass the client to each SDK function.
@@ -59,6 +71,12 @@ export type UserConfig = Plugin.Name<'@hey-api/sdk'> &
      * @default 'flat'
      */
     operations?: OperationsStrategy | UserOperationsConfig;
+    /**
+     * Casing convention for operations parameters names.
+     *
+     * @default 'camelCase'
+     */
+    paramsCase?: Casing;
     /**
      * Define how request parameters are structured in generated SDK methods.
      *
@@ -210,6 +228,18 @@ export type Config = Plugin.Name<'@hey-api/sdk'> &
      */
     auth: boolean;
     /**
+     * Allow spreading body as parameters if it's the only object in the operation signature.
+     *
+     * @default true
+     */
+    bodyAllowSpread: boolean;
+    /**
+     * Use the body schema type name for its parameter name in `'flat'` paramStructure.
+     *
+     * @default true
+     */
+    bodyParamAsTypeName: boolean;
+    /**
      * Use an internal client instance to send HTTP requests? This is useful if
      * you don't want to manually pass the client to each SDK function.
      *
@@ -229,6 +259,12 @@ export type Config = Plugin.Name<'@hey-api/sdk'> &
      * Define the structure of generated SDK operations.
      */
     operations: OperationsConfig;
+    /**
+     * Casing convention for operations parameters names.
+     *
+     * @default 'camelCase'
+     */
+    paramsCase: Casing;
     /**
      * Define how request parameters are structured in generated SDK methods.
      *

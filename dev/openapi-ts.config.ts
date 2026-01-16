@@ -302,6 +302,8 @@ export default defineConfig(() => {
         },
         {
           auth: false,
+          bodyAllowSpread: false,
+          bodyParamAsTypeName: false,
           // client: false,
           examples: {
             // enabled: false,

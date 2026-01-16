@@ -1,9 +1,9 @@
 import type { IR } from '~/ir/types';
-import type { PluginInstance } from '~/plugins/shared/utils/instance';
 import { toCase } from '~/utils/naming';
 import { refToName } from '~/utils/ref';
 
 import type { Field } from '../../client-core/bundle/params';
+import type { HeyApiSdkPlugin } from '../types';
 
 type Location = keyof IR.ParametersObject | 'body';
 
@@ -40,9 +40,10 @@ type Signature = {
  */
 export const getSignatureParameters = ({
   operation,
+  plugin,
 }: {
   operation: IR.OperationObject;
-  plugin: PluginInstance;
+  plugin: HeyApiSdkPlugin['Instance'];
 }): Signature | undefined => {
   // TODO: add cookies
   const locations = [
@@ -72,6 +73,7 @@ export const getSignatureParameters = ({
   if (operation.body) {
     // spread body if there's only a single object
     if (
+      plugin.config.bodyAllowSpread &&
       !operation.body.schema.logicalOperator &&
       operation.body.schema.type === 'object' &&
       operation.body.schema.properties
@@ -80,10 +82,13 @@ export const getSignatureParameters = ({
       for (const key in properties) {
         addParameter(key, 'body');
       }
-    } else if (operation.body.schema.$ref) {
+    } else if (
+      plugin.config.bodyParamAsTypeName &&
+      operation.body.schema.$ref
+    ) {
       // alias body for more ergonomic naming, e.g. user if the type is User
       const name = refToName(operation.body.schema.$ref);
-      const key = toCase(name, 'camelCase');
+      const key = toCase(name, plugin.config.paramsCase);
       addParameter(key, 'body');
     } else {
       addParameter('body', 'body');
@@ -130,6 +135,7 @@ export const getSignatureParameters = ({
   if (operation.body) {
     const location = 'body';
     if (
+      plugin.config.bodyAllowSpread &&
       !operation.body.schema.logicalOperator &&
       operation.body.schema.type === 'object' &&
       operation.body.schema.properties
@@ -155,9 +161,12 @@ export const getSignatureParameters = ({
           ...(name !== originalName ? { map: originalName } : {}),
         });
       }
-    } else if (operation.body.schema.$ref) {
+    } else if (
+      plugin.config.bodyParamAsTypeName &&
+      operation.body.schema.$ref
+    ) {
       const value = refToName(operation.body.schema.$ref);
-      const originalName = toCase(value, 'camelCase');
+      const originalName = toCase(value, plugin.config.paramsCase);
       const name = conflicts.has(originalName)
         ? `${location}_${originalName}`
         : originalName;
