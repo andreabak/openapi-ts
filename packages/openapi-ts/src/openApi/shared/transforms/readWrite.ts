@@ -140,7 +140,19 @@ const pruneSchemaByScope = (
   schema: unknown,
   scope: 'readOnly' | 'writeOnly',
 ): boolean => {
+  const isEmptyObjectSchema = () =>
+    schema &&
+    (typeof schema === 'object' && (schema as Record<string, unknown>).type) ===
+      'object' &&
+    !childSchemaRelationships.some(
+      ([keyword]) => keyword in (schema as Record<string, unknown>),
+    );
+
   if (schema && typeof schema === 'object') {
+    // Edge case where OpenAPI schema is a nondescript object, should keep to convert to Record
+    if (isEmptyObjectSchema()) {
+      return false;
+    }
     // Handle $ref schemas
     if ('$ref' in schema && typeof schema.$ref === 'string') {
       const nodeInfo = graph.nodes.get(schema.$ref);
@@ -289,10 +301,7 @@ const pruneSchemaByScope = (
       }
     }
     // After all removals, if this is type: object and has no structural fields, remove it
-    if (
-      (schema as Record<string, unknown>).type === 'object' &&
-      !childSchemaRelationships.some(([keyword]) => keyword in schema)
-    ) {
+    if (isEmptyObjectSchema()) {
       return true;
     }
   }
