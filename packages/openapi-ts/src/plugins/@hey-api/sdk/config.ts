@@ -8,8 +8,8 @@ import type { HeyApiSdkPlugin } from './types';
 export const defaultConfig: HeyApiSdkPlugin['Config'] = {
   config: {
     auth: true,
-    bodyAllowSpread: false,
-    bodyParamAsTypeName: false,
+    bodyAllowSpread: true,
+    bodyParamAsTypeName: true,
     client: true,
     exportFromIndex: true,
     paramsCase: 'camelCase',

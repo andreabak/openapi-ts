@@ -190,7 +190,7 @@ export const getSignatureParameters = ({
         name: 'body',
         schema: operation.body.schema,
       };
-      fields.push({ in: 'body' });
+      fields.push({ key: 'body', map: 'body' });
     }
   }
 
